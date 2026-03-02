@@ -1,148 +1,196 @@
-
 # Module Lab: Automating Python Projects with Pip, PyPi & Scripting
 
-## Learning Goals
+## Overview
 
-- Automate Python tasks using command-line scripts.
-- Use pip to install and manage external packages.
-- Write modular Python scripts with clean entry points.
-- Track dependencies using a requirements.txt file.
-- Generate structured outputs using file I/O techniques.
+This lab demonstrates how to build a modular Python automation tool using:
 
-## Introduction
+- File I/O
+- Timestamped output files
+- Virtual environments
+- Dependency management with pip
+- Reproducible environments using requirements.txt
+- Git version control workflows
 
-In this lab, you will build a **Python automation tool** that uses pip-installed packages and scriptable logic to automate a real-world task. Your script will:
+The project focuses on implementing a reusable function called `generate_log()` that creates timestamped log files from a list of entries.
 
-- Use pip to install third-party packages (e.g., `requests`).
-- Fetch or process external data.
-- Write structured output to a local file.
-- Track all dependencies in `requirements.txt` for reproducibility.
 
-This lab emphasizes automation, scripting practices, and environment management using the standard Python ecosystem.
+
+## Project Structure
+
+```
+module-lab-pip-pypi-scripting/
+│
+├── lib/
+│ └── generate_log.py
+│
+├── testing/
+│ └── test_generate_log.py
+│
+├── requirements.txt
+└── README.md
+```
+
+
 
 ## Setup Instructions
 
-### Fork and Clone the Repository
+### Clone the Repository
 
-1. Go to the provided GitHub repository link.
-2. Fork the repository to your GitHub account.
-3. Clone the forked repository to your local machine using:
-
-```bash
+```
 git clone <repo-url>
 cd module-lab-pip-pypi-scripting
 ```
 
-### Install Python and pip
 
-Ensure Python and pip are installed:
+### Create and Activate a Virtual Environment
 
-```bash
-python --version
-pip --version
+
+```
+python3 -m venv venv
+source venv/bin/activate
 ```
 
-Optionally, create a virtual environment:
 
-```bash
-python -m venv venv
-source venv/bin/activate  # macOS/Linux
-venv\Scripts\activate   # Windows
+### Install Dependencies
+
 ```
-
-Install any required dependencies:
-
-```bash
 pip install -r requirements.txt
 ```
-
-## Tasks
-
-### Task 1: Define the Problem
-
-Your goal is to create a **Python script** that automates a small task:
-
-- Uses one or more pip-installed packages (e.g., `requests`, `pandas`, `rich`)
-- Outputs data to a `.txt` or `.csv` file using File I/O
-- Logs or prints messages to confirm behavior
-- Is executable from the command line
-- Records dependencies in `requirements.txt`
-
----
-
-### Task 2: Determine the Design
-
-You will implement a script with the following design principles:
-
-- Use `pip` to install packages
-- Import modules inside a Python script
-- Wrap logic in `if __name__ == "__main__"` to support reusability
-- Structure output files with filenames that include timestamps
-- Track dependencies using `pip freeze > requirements.txt`
-
----
-
-### Task 3: Develop and Run Your Script
-
-#### Step 1: Create a script called `generate_log.py`
-
-```python
-from datetime import datetime
-
-log_data = ["User logged in", "User updated profile", "Report exported"]
-filename = f"log_{datetime.now().strftime('%Y%m%d')}.txt"
-
-with open(filename, "w") as file:
-    for entry in log_data:
-        file.write(f"{entry}\n")
-
-print(f"Log written to {filename}")
+Or 
 ```
-
-#### Step 2: Add an API integration using `requests`
-
-```python
-import requests
-
-def fetch_data():
-    response = requests.get("https://jsonplaceholder.typicode.com/posts/1")
-    if response.status_code == 200:
-        return response.json()
-    return {}
-
-if __name__ == "__main__":
-    post = fetch_data()
-    print("Fetched Post Title:", post.get("title", "No title found"))
-```
-
-#### Step 3: Track your dependencies
-
-After installing any packages with `pip install ...`, run:
-
-```bash
+pip install pytest requests
 pip freeze > requirements.txt
 ```
 
----
 
-## Best Practices
+## Core Implementation
 
-- Use clear function names (`fetch_data`, `write_log`) for clarity.
-- Always check file write success with print or logging statements.
-- Avoid hardcoding data—use variables and functions where appropriate.
-- Use virtual environments to isolate dependencies.
-- Wrap script logic in `if __name__ == "__main__"` for script reusability.
+### The `generate_log()` Function
 
----
+- Validates that input is a list
+- Raises a `ValueError` for invalid input
+- Generates a timestamped filename in the format:
 
-## Conclusion
 
-After completing this lab, you will:
+log_YYYYMMDD.txt
 
-✅ Automate tasks with Python scripting  
-✅ Use external packages from PyPi with pip  
-✅ Track project dependencies with `requirements.txt`  
-✅ Generate structured output files from your script  
-✅ Structure projects for portability and collaboration
 
-These scripting and packaging skills are essential for building automation tools and working in modern Python development workflows.
+- Writes each log entry on a new line
+- Prints a confirmation message
+- Returns the filename for testing
+
+
+### Implementation (`lib/generate_log.py`)
+
+
+from datetime import datetime
+import os
+
+def generate_log(data):
+if not isinstance(data, list):
+raise ValueError("Input must be a list.")
+
+today = datetime.now().strftime("%Y%m%d")
+filename = f"log_{today}.txt"
+
+with open(filename, "w") as file:
+    for entry in data:
+        file.write(f"{entry}\n")
+
+print(f"Log written to {filename}")
+return filename
+
+if name == "main":
+sample_data = ["User logged in", "User updated profile", "Report exported"]
+generate_log(sample_data)
+
+
+
+## Running the Script
+
+From the project root directory:
+
+```
+python lib/generate_log.py
+```
+
+Expected output:
+
+```
+Log written to log_YYYYMMDD.txt
+```
+
+
+## Running Tests
+
+This project uses pytest.
+
+```
+pytest
+```
+
+Expected result:
+
+```
+5 passed
+```
+
+The test suite verifies:
+
+- The log file is created
+- The filename format is correct
+- File contents exactly match the input list
+- A `ValueError` is raised for invalid input
+- An empty list creates a valid empty file
+
+
+## Dependency Management
+
+To ensure reproducibility:
+
+```
+pip freeze > requirements.txt
+```
+
+This allows the environment to be recreated exactly on any system.
+
+
+
+## Git Workflow
+
+Create a feature branch:
+
+```
+git checkout -b feature-automation-tool
+```
+
+Commit changes:
+
+```
+git add .
+git commit -m "Implement generate_log function"
+```
+
+Merge using the terminal:
+
+```
+git checkout main
+git merge feature-automation-tool
+git push origin main
+```
+
+
+## Best Practices Applied
+
+- Input validation using `isinstance`
+- Error handling with `ValueError`
+- Modular script design
+- Clean entry point using:
+
+
+if name == "main":
+
+
+- Dependency tracking with requirements.txt
+- Virtual environment isolation
+- Git branch-based workflow
